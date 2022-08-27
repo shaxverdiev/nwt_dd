@@ -39,16 +39,23 @@ const tokenModel = sequelize.define(
       require: true,
       allowNull: false,
     },
+    user_uid: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      require: true,
+      unique: true,
+      references: {
+        model: userModel,
+        key: 'uid'
+      }
+    }
   },
   {
     timestamps: false,
   }
 );
 
-userModel.hasMany(tokenModel, {
-  allowNull: false,
-  foreignKey: "uid_id",
-});
+userModel.hasMany(tokenModel);
 
 (async () => {
   // Пересоздаем таблицу в БД
