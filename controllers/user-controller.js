@@ -3,13 +3,12 @@ const userService = require("../service/user-service");
 class UserController {
   async registration(req, res, next) {
     try {
-      const { email, password } = req.body;
-      const userData = await userService.registration(email, password);
+      const { email, password, role, key} = req.body;
+      const userData = await userService.registration(email, password, role, key);
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
       });
-      console.log("controller work...");
       return res.json(userData);
     } catch (e) {
       console.log(e);
@@ -68,6 +67,25 @@ class UserController {
       return res.json(userData);
     } catch (e) {
       next(e);
+    }
+  }
+
+  async uploadFile(req, res, next) {
+    try {
+      const file = req.files.file
+    } catch (e) {
+      console.log(e)
+      return res.status(500).json({message: 'Upload errorrrr!'})
+    }
+  }
+
+
+  async forAdmin(req, res, next) {
+    try {
+      res.json({message: 'SUCCESS ACCESS SEXES.......................'})
+    } catch(e) {
+      console.log(e)
+      return res.status(500).json({message: 'you is not admin'})
     }
   }
 }

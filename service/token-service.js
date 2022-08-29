@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
-const { tokenModel } = require("../models/user-token-model");
+const { tokenModel } = require("../models/models");
 
 class TokenService {
   //payload получили из userDto
-  generateTokens(payload) {
+    generateTokens(payload) {
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
       expiresIn: "1m",
     });
@@ -22,6 +22,7 @@ class TokenService {
   validateAccessToken(token) {
     try {
       const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      console.log('=========================>>>>>>',userData.role ,'<<<<<<<========================ACCESS============AFTER.VERIFY===========================================')
       return userData;
     } catch (e) {
       return null;
@@ -32,6 +33,7 @@ class TokenService {
   validateRefreshToken(token) {
     try {
       const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+      console.log(userData.role, '==============================REFRESH===============AFTER.VERIFY==================================')
       return userData;
     } catch (e) {
       return null;
@@ -50,7 +52,7 @@ class TokenService {
     //создаем поля в таблице tokens
     const token = await tokenModel.create({ user_uid: userId, refreshToken });
     return token;
-  } 
+  }
 
   async removeToken(refreshToken) {
     const tokenData = await tokenModel.destroy({
@@ -60,8 +62,10 @@ class TokenService {
   }
 
   async findToken(refreshTok) {
-    const tokenData = await tokenModel.findOne({where: {refreshToken: refreshTok}})
-    return tokenData
+    const tokenData = await tokenModel.findOne({
+      where: { refreshToken: refreshTok },
+    });
+    return tokenData;
   }
 }
 

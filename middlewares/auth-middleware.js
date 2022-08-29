@@ -5,7 +5,7 @@ const tokenService = require("../service/token-service");
 module.exports = function (req, res, next) {
   try {
     // вытаскиваем из хэдера авторизации ACCESS токен
-    const authorizationHeader = req.headers.authorization;
+    const authorizationHeader = req.headers.authorization
     //поверка есть ли существует ли вообще такой header
     if (!authorizationHeader) {
       return next(ApiError.UnAuthorizedError());
@@ -21,6 +21,7 @@ module.exports = function (req, res, next) {
       return next(ApiError.UnAuthorizedError());
     }
 
+    // если все успешно в поле user у request'a помещаем данные пользователя
     req.user = userData;
     next();
   } catch (e) {
