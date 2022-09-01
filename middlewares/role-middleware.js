@@ -11,7 +11,7 @@ module.exports = function (req, res, next) {
     // if (!authorizationHeader) {
     //   return next(ApiError.UnAuthorizedError());
     // }
-
+ 
     // //вытаскиваем access токен
     const accessToken = authHeader.split(" ")[1];
     console.log("=========.....>>>>>>>>>>>>", accessToken);

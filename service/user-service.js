@@ -2,29 +2,36 @@ const bcrypt = require("bcrypt");
 const UserDto = require("../dto/user-dto");
 const tokenService = require("./token-service");
 const keysService = require("../service/key-service");
+const { keyValidate, addUIDinTableKeys } = require("../service/key-service");
 const ApiError = require("../exeptions/api-error");
 const { tokenModel, userModel } = require("../models/models");
+const RegUserDB = require("../service/reg-service");
+const { sequelize, transaction } = require("../db/db");
 
 class UserService {
   async registration(email, password, role, key) {
-    const hashPassword = await bcrypt.hash(password, 3);
+    // console.log(email, password, role, key);
 
-    const user = await userModel.create({
-      email,
-      password: hashPassword,
-      role,
-    });
+    if (role == "ADMIN") {
+      const tr = await sequelize.transaction(async () => {
+        const one = await keyValidate(key);
+        console.log(1);
 
-    // создаем токен для этого пользователя в таблице 'tokens'
-    const userDto = new UserDto(user); // из user извлекаются необходимые поля для создания payload
-    const tokens = tokenService.generateTokens({ ...userDto });
-    //сохраняем сгенерированные токен и uid в базу данных
-    await tokenService.saveToken(userDto.uid, tokens.refreshToken); // userDto.id - колонка uid_id, token.refreshToken - колонка refreshToken в бд
-
-    //сохраняем ключ для админов
-    await keysService.saveKeys(userDto.uid, role, key);
-
-    return { ...tokens, user: userDto, key };
+        const two = await RegUserDB.createINDB(email, password, role, key);
+        const {user: userDto, ...tokens} = two
+        console.log(2, two.user.uid);
+        console.log(two)
+        
+        //тут нужен uid созданный в RegUserDB.createINDB
+        const three = await addUIDinTableKeys(two.user.uid, key);
+        console.log(3);
+        return { ...tokens, user: userDto, key };
+      });
+      return tr
+    } else {
+      console.log("просто юзер .........");
+      return await RegUserDB.createINDB(email, password, role, key);
+    }
   }
 
   async login(email, password) {

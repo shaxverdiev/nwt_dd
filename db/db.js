@@ -1,5 +1,9 @@
 const { Sequelize } = require("sequelize");
+const { createNamespace } = require("cls-hooked");
 
+const namespace = createNamespace("ns");
+Sequelize.useCLS(namespace);
+ 
 // создается новое подключение к базе данных
 const sequelize = new Sequelize({
   dialect: "postgres",
@@ -25,5 +29,16 @@ async function openConnection() {
   }
 }
 
+async function closeConnection() {
+  try {
+    await sequelize.close();
+    console.log("Соединение прекращено");
+  } catch (e) {
+    console.log("Соединение не может быть прекращено", e);
+  }
+}
+
+
+module.exports.namespace = namespace;
 module.exports.sequelize = sequelize;
 module.exports.openConnection = openConnection();

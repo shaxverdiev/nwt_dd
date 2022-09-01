@@ -1,10 +1,14 @@
 const userService = require("../service/user-service");
+const KeyService  = require('../service/key-service');
+const keyService = require("../service/key-service");
+const regService = require("../service/reg-service");
 
 class UserController {
   async registration(req, res, next) {
     try {
       const { email, password, role, key} = req.body;
       const userData = await userService.registration(email, password, role, key);
+      console.log('````````````````````````````````````````',userData, '======================================++++++++++++-_____________________________')
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -14,7 +18,7 @@ class UserController {
       console.log(e);
     }
   }
-
+  
   async login(req, res, next) {
     try {
       const { email, password } = req.body;
@@ -86,6 +90,16 @@ class UserController {
     } catch(e) {
       console.log(e)
       return res.status(500).json({message: 'you is not admin'})
+    }
+  }
+
+  async generateNewKey(req, res, next) {
+    try {
+      const {secretWord} = req.body
+      const keyGen = keyService.keyGen(secretWord)
+      return res.json({message:'ключ сгенерирован'})
+    } catch (e) {
+      console.log(e, "generate new key error...............>>>>>>>>>>>>>>>>>>>")
     }
   }
 }

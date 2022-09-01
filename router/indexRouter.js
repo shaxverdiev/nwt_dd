@@ -11,6 +11,7 @@ router.post('/logout', userController.logout)
 router.get('/users', authMiddleware, userController.getUsers)
 router.get('/refresh', userController.refresh)
 router.get('/for_admin', roleMiddleware, userController.forAdmin)
+router.post('/generate_adminKey',roleMiddleware, userController.generateNewKey)
     
 
 module.exports = router
