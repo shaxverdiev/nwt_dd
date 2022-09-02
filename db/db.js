@@ -42,3 +42,4 @@ async function closeConnection() {
 module.exports.namespace = namespace;
 module.exports.sequelize = sequelize;
 module.exports.openConnection = openConnection();
+// module.exports.closeConnection = closeConnection()

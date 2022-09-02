@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const UserDto = require("../dto/user-dto");
 const tokenService = require("./token-service");
-const keysService = require("../service/key-service");
 const { keyValidate } = require("../service/key-service");
 const ApiError = require("../exeptions/api-error");
 const { tokenModel, userModel } = require("../models/models");
