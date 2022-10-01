@@ -3,12 +3,14 @@ const UserDto = require("../dto/user-dto");
 const tokenService = require("./token-service");
 const { keyValidate, addUIDinTableKeys } = require("../service/key-service");
 const ApiError = require("../exeptions/api-error");
-const { tokenModel, userModel } = require("../models/models");
+const {userModel, tokenModel} = require('../models/models')
+
 const RegUserDB = require("../service/reg-service");
 const { sequelize, transaction } = require("../db/db");
 
 class UserService {
   async registration(email, password, role, key) {
+    //это транзакция для определения роли
     if (role == "ADMIN") {
       const transRes = await sequelize.transaction(async () => {
         const one = await keyValidate(key);
@@ -25,6 +27,7 @@ class UserService {
     }
   }
 
+  
   async login(email, password) {
     const user = await userModel.findOne({ where: { email: email } });
     if (!user) {

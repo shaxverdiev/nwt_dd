@@ -1,11 +1,12 @@
 const jwt = require("jsonwebtoken");
-const { tokenModel } = require("../models/models");
+const {tokenModel} = require("../models/models");
+
 
 class TokenService {
   //payload получили из userDto
   generateTokens(payload) {
     const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: "1m",
+      expiresIn: "1d",
     });
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, {
       expiresIn: "30d",
@@ -45,9 +46,7 @@ class TokenService {
       return tokenData.save();
     }
     //создаем поля в таблице tokens
-    const token = await tokenModel.create(
-      { user_uid: userId, refreshToken }
-    );
+    const token = await tokenModel.create({ user_uid: userId, refreshToken });
     return token;
   }
 

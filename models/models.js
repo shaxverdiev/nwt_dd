@@ -1,7 +1,3 @@
-// если в будущем добавить миграции, то они не удалят существующие таблицы
-// во первых потому что они заранее прописаны в дректории models
-// во вторых пока в логике самой миграции не предусмотренно удаление начальных страниц, они не будут удалены
-
 const { Sequelize, DataTypes } = require("sequelize");
 const { sequelize } = require("../db/db");
 
@@ -33,13 +29,32 @@ const userModel = sequelize.define(
       type: DataTypes.STRING,
       require: true,
       allowNull: false,
-      defaultValue: 'USER',
-    }
+      defaultValue: "USER",
+    },
   },
   {
     timestamps: false,
   }
 );
+
+const keyModel = sequelize.define("keys", {
+  access_key: {
+    type: DataTypes.STRING,
+    require: true,
+    unique: true,
+    defaultValue: "USER",
+  },
+  user_uid: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    require: true,
+    unique: true,
+    references: {
+      model: userModel,
+      key: "uid",
+    },
+  },
+});
 
 const tokenModel = sequelize.define(
   "token",
@@ -65,33 +80,96 @@ const tokenModel = sequelize.define(
   }
 );
 
-const keysModel = sequelize.define(
-  "keys", 
+const fileModel = sequelize.define(
+  "file",
   {
-    access_key: {
+    name: {
       type: DataTypes.STRING,
       require: true,
-      unique: true,
-      defaultValue: "USER"
     },
+    typefile: {
+      type: DataTypes.STRING,
+      require: true,
+    },
+    size: { type: DataTypes.INTEGER, defaultValue: 0 },
+    path: { type: DataTypes.STRING, defaultValue: "" },
     user_uid: {
       type: DataTypes.UUID,
-      allowNull: true,
-      require: true,
-      unique: true,
       references: {
         model: userModel,
-        key: "uid"
-      }
-    }
+        key: "uid",
+      },
+    },
+  },
+  {
+    timestamps: false,
   }
 );
 
+const postModel = sequelize.define(
+  "post",
+  {
+    // id: {
+    //   type: DataTypes.INTEGER,
+    //   require: true,
+    //   primaryKey: true,
+    // },
+    title: {  
+      type: DataTypes.STRING,
+      require: true,
+    },
+    contentPost: {
+      type: DataTypes.TEXT,
+      require: true,
+    },
+    user_id: {
+      type: DataTypes.UUID,
+      require: true,
+      references: {
+        model: userModel,
+        key: "uid",
+      },
+    }
+  },
+  {
+    timestamps: false,
+  }
+);
 
-(async () => {
-  // Пересоздаем таблицу в БД
-  await sequelize.sync();
-  // дальнейший код
-})();
+const commentModel = sequelize.define(
+  "comment",
+  {
+    contentComment: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },  
+    user_id: {
+      type: DataTypes.UUID,
+      require: true,
+      references: {
+        model: userModel,
+        key: "uid",
+      },
+    },
+    post_id: {
+      type: DataTypes.INTEGER,
+      require: true,
+      references: {
+        model: postModel,
+        key: "id",
+      },
+    },
+  },
+  {
+    timestamps: false,
+  }
+);
 
-module.exports = { tokenModel, userModel, keysModel};
+module.exports = {
+  userModel,
+  fileModel,
+  tokenModel,
+  keyModel,
+  postModel,
+  commentModel
+};

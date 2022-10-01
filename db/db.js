@@ -1,9 +1,10 @@
 const { Sequelize } = require("sequelize");
 const { createNamespace } = require("cls-hooked");
+// const fileModel = require(r'../models/file-model')
 
 const namespace = createNamespace("ns");
 Sequelize.useCLS(namespace);
- 
+
 // создается новое подключение к базе данных
 const sequelize = new Sequelize({
   dialect: "postgres",
@@ -13,6 +14,7 @@ const sequelize = new Sequelize({
   password: `${process.env.DB_PASSWORD}`,
   port: process.env.DB_PORT,
   database: process.env.DB_DATABASE,
+  sync: true,
   timezone: "+00:00",
   define: {
     timestamps: false,
@@ -29,15 +31,20 @@ async function openConnection() {
   }
 }
 
-async function closeConnection() {
-  try {
-    await sequelize.close();
-    console.log("Соединение прекращено");
-  } catch (e) {
-    console.log("Соединение не может быть прекращено", e);
-  }
-}
+// async function closeConnection() {
+//   try {
+//     await sequelize.close();
+//     console.log("Соединение прекращено");
+//   } catch (e) {
+//     console.log("Соединение не может быть прекращено", e);
+//   }
+// }
 
+(async () => {
+  // Пересоздаем таблицу в БД
+  await sequelize.sync();
+  // дальнейший код
+})();
 
 module.exports.namespace = namespace;
 module.exports.sequelize = sequelize;

@@ -1,10 +1,19 @@
 const userService = require("../service/user-service");
 const keyService = require("../service/key-service");
+const { validationResult } = require("express-validator");
 const regService = require("../service/reg-service");
+const ApiError = require("../exeptions/api-error");
+const File = require("../service/file-service");
 
 class UserController {
   async registration(req, res, next) {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest("Ошибка при валидации", errors.array())
+        );
+      }
       const { email, password, role, key } = req.body;
       const userData = await userService.registration(
         email,
@@ -73,9 +82,11 @@ class UserController {
     }
   }
 
-  async uploadFile(req, res, next) {
+  ////////////////////////////////////////////////////////////////////////////////////////////
+  async createDir(req, res, next) {
     try {
-      const file = req.files.file;
+      const { name, type } = req.body;
+      const file = new File();
     } catch (e) {
       console.log(e);
       return res.status(500).json({ message: "Upload errorrrr!" });
