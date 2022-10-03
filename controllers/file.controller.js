@@ -5,8 +5,7 @@ class FileController {
   createFile(req, res, next) {
     const ver = verifyToken(req);
     const uidFromToken = ver.validToken.uid;
-    console.log(uidFromToken)
-
+    
     const createDB = fileModel.create({
       name: req.file.filename,
       typefile: req.file.mimetype,
